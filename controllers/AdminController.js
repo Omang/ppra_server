@@ -95,7 +95,7 @@ const appverifyreturn = async(req, res)=>{
                 from: 'manwish01@gmail.com',
                 to: updateuser?.email,
                 subject: thehead,
-                text:  themessage
+                text:  'One of your codes need attention. Go to your Dashboard, view codes and fix it'
               };
               
                sendemail(mailOptions, function(error,info){
@@ -214,7 +214,7 @@ const appverify = async(req, res)=>{
             }
         },{new:true});
 
-        if(updateforpaycodes.company_codes.length == updateforpaycodes.topayment_codes.length){
+        if(updateforpaycodes.company_codes.length === updateforpaycodes.topayment_codes.length){
            
             const createsms = await Comm.create({
                 message_type: "Application and Codes Payment",
@@ -371,12 +371,23 @@ const adjudicationview = async(req, res)=>{
 
 }
 const companycodesview = async(req, res)=>{
-    const {user_id} = req.body;
+    const {auth_id} = req.body;
+    const allcodes = [];
     try{
         //view company with all applied codes
-        const viewcompany = await Company.findOne({auth_id: user_id}).populate('company_codes');
+        const viewcompany = await Company.findOne({auth_id: auth_id}).populate('company_codes');
+        if(viewcompany){
+            for(let i =0; i < viewcompany.company_codes.length; i++){
 
-        res.json(viewcompany);
+                const { _id, subcode, subcode_level, attachment} = viewcompany.company_codes[i];
+                const {subcode_name} = await Subcodes.findById(subcode);
+                allcodes.push({ app_id: _id, name: subcode_name, subcode_level, attachment});
+
+            }
+            res.json(allcodes);
+
+        }  
+        
         
 
     }catch(e){

@@ -8,17 +8,37 @@ const Subcodes = require('../models/SubcodesModel');
 
 const normalpayment = async(req, res)=>{
 
-    const {auth_id, app_id, company_id} = req.body;
+    const {auth_id, company_id} = req.body;
 
     try{
 
         const paynormal = await Company.findByIdAndUpdate(company_id, {
             application_fees: true
         })
+        if(paynormal){
+            const finduserandupdate = await Auth.findById(auth_id);
+            var mailOptions = {
+                from: 'manwish01@gmail.com',
+                to: finduserandupdate?.email,
+                subject: 'Payment Successful',
+                text:  "Your payment has been successful, your application is on the next stage. will take 2 weeks"
+              };
+              
+              sendemail(mailOptions, function(error,info){
+                if(error){
+                  console.log(error);
+                  res.json(error);
+                }else{
+                  res.json({message: 'Payment Successful'});
+                }
+              })
+        }
         
 
        
     }catch(e){
+
+        throw new Error(e);
 
     }
 
@@ -30,13 +50,33 @@ const expresspayment = async(req, res)=>{
 
     try{
 
-        const paynormal = await Company.findByIdAndUpdate(company_id, {
+        const payexpress = await Company.findByIdAndUpdate(company_id, {
             codes_express: true
         })
+        if(payexpress){
+            const finduserandupdate = await Auth.findById(auth_id);
+            var mailOptions = {
+                from: 'manwish01@gmail.com',
+                to: finduserandupdate?.email,
+                subject: 'Payment Express Successful',
+                text:  "Your Express payment has been successful, your application is on the next stage. will take 2 days to 4 days"
+              };
+              
+              sendemail(mailOptions, function(error,info){
+                if(error){
+                  console.log(error);
+                  res.json(error);
+                }else{
+                  res.json({message: 'Payment Successful'});
+                }
+              })
+        }
         
 
        
     }catch(e){
+
+        throw new Error(e);
 
     }
 

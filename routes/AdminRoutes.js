@@ -6,12 +6,12 @@ const {appverifyreturn, createsubcodes, createCode, createcat, appevaluationretu
 
 const {authMiddleware, isAdmin, isVerifier, isAssessor, isEvaluator} = require('../middlewares/authMiddleware');
 
-router.post('/office/verifyreturn', authMiddleware, isVerifier, appverifyreturn);
-router.post('/office/appverify' , authMiddleware, isVerifier, appverify);
-router.post('/office/evaluationreturn' , authMiddleware, isEvaluator, appevaluationreturn);
-router.post('/office/appevaluation', authMiddleware, isEvaluator, appevaluation);
-router.post('/office/assessmentreturn', authMiddleware, isAssessor, appassessmentreturn );
-router.post('/office/appassessment', authMiddleware, isAssessor, appassesment);
+router.post('/office/verifyreturn', authMiddleware, appverifyreturn);
+router.post('/office/appverify' , authMiddleware, appverify);
+router.post('/office/evaluationreturn' , authMiddleware, appevaluationreturn);
+router.post('/office/appevaluation', authMiddleware, appevaluation);
+router.post('/office/assessmentreturn', authMiddleware, appassessmentreturn );
+router.post('/office/appassessment', authMiddleware, appassesment);
 router.post('/codeview', authMiddleware, companycodesview);
 router.post('/createcat', authMiddleware, createcat);
 router.post('/createcode', authMiddleware, createCode);
