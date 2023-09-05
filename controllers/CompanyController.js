@@ -29,7 +29,10 @@ const updateCompany = async(req, res)=>{
                 account_name: bank_name,
                 account_branch: bank_branch,
                 account_number: bank_number,
-                bank_letter : bank_letter
+                bank_letter : bank_letter         
+
+
+                
             },
             company_contacts:{
                 email: email,

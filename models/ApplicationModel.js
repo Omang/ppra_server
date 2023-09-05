@@ -3,23 +3,15 @@ const mongoose = require('mongoose');
 const AppSchema = new mongoose.Schema({
         
         auth_id: {type: mongoose.Schema.Types.ObjectId, ref: "Auth"},
-        company_id: {type: mongoose.Schema.Types.ObjectId, ref: "Company"},
-        subcode: {type: mongoose.Schema.Types.ObjectId, ref: "Subcodes"},
-        attachment: [{type: String}],
-        subcode_level: {type: String},
-        subcode_pendingverification: {type: Boolean, default: true},
-        subcode_pendingassesment: {type: Boolean, default: true},
-        subcode_pendingevaluation: {type: Boolean, default: true},
-        subcode_pendingadjudication: {type: Boolean, default: true},
-        subcode_approve: {type: Boolean, default: false},
-        verification_by: {type: mongoose.Schema.Types.ObjectId, ref:'Auth'},
-        assesment_by: {type: mongoose.Schema.Types.ObjectId, ref: 'Auth'},
-        evaluation_by: {type: mongoose.Schema.Types.ObjectId, ref: 'Auth'},
-        adjudication_by:[{type: mongoose.Schema.Types.ObjectId, ref: 'Auth'}],
-        assessment_docs:[{type: String}],
-        verification_comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comm'}],
-        assesment_comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comm'}],
-        evaluation_comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comm'}]
+        application_type: {type: String},
+        application_cost: {type: String},
+        application_village:{type:String},
+        application_paid: {type:Boolean, default:false},
+        license_paid: {type:Boolean, default:false},
+        application_approved: {type: Boolean, default: true},
+        application_pending: {type: Boolean, default: true},
+        application_approveby: {type: mongoose.Schema.Types.ObjectId, ref:'Auth'},
+        application_comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comm'}]
      
 }, {timestamps: true})
 

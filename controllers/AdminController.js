@@ -396,5 +396,28 @@ const companycodesview = async(req, res)=>{
 
 
 }
+const getallcodes = async(req, res)=>{
+    const {id}=req.body;
+    try{
 
-module.exports ={appverifyreturn, createsubcodes, createCode, createcat, appevaluationreturn, appassessmentreturn, companycodesview, appverify, appassesment, appevaluation, appview, pendingview, assesmentview, evaluationview, adjudicationview };
+        const getall = await Codes.find();
+
+        res.json(getall);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+const getsubcodes = async(req, res)=>{
+    const {code_id}=req.body;
+    try{
+
+        const getsubcodev = await Codes.findById(code_id).populate('subcodes');
+
+        res.json(getsubcodev.subcodes);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+module.exports ={getallcodes, getsubcodes, appverifyreturn, createsubcodes, createCode, createcat, appevaluationreturn, appassessmentreturn, companycodesview, appverify, appassesment, appevaluation, appview, pendingview, assesmentview, evaluationview, adjudicationview };

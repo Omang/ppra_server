@@ -10,7 +10,7 @@ const AuthSchema = new mongoose.Schema({
     mobilenumber: {type:String},
     DOB: {type:String},
     POB: {type:String},
-    Nationality: {type:String},
+    nationality: {type:String},
     role:{type:String , default: 'contractor'},
     refreshToken:{type:String},
     messages:[{type: mongoose.Schema.Types.ObjectId, ref: 'Comm'}]
