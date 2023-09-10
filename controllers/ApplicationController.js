@@ -5,6 +5,22 @@ const Comm = require('../models/ComModel');
 const {sendemail} = require('../config/MailConnect');
 const Auth = require('../models/AuthModel');
 const Subcodes = require('../models/SubcodesModel');
+const multer = require('multer');
+const fs = require('fs');
+
+const uploadPhoto = async(req,res)=>{
+    const uploadedFiles = [];
+   for (var i = 0; i < req.files.length; i++) {
+      const {path, originalname}= req.files[i];
+      const parts = originalname.split('.');
+      const ext = parts[parts.length - 1];
+      const newPath = path + '.'+ext;
+      fs.renameSync(path, newPath);
+      uploadedFiles.push(newPath.replace('uploads\\', ''));
+
+   }
+    res.json(uploadedFiles);  
+}
 
 const applicationpayment = async(req, res)=>{
 
@@ -87,7 +103,7 @@ const licensepayment = async(req, res)=>{
 }
 
 const newApplication = async(req, res)=>{
-    const {auth_id, application_type, application_cost, application_village} = req.body;
+    const {auth_id, application_type, application_cost, application_attachment} = req.body;
 
     try{
         
@@ -95,14 +111,14 @@ const newApplication = async(req, res)=>{
             auth_id: auth_id,
             application_type: application_type,
             application_cost: application_cost,
-            application_village: application_village
+            application_attachment: application_attachment
         });
 
         if(addcode){
 
               const sms = await Comm.create({
                     messsage_type: 'New Application at Water Department',
-                    themessage: "New Application maked by you. Waiting verification..will take 2 days to verify"
+                    themessage: "New Application made by you. Waiting verification..will take 2 days to verify"
                 })
                 if(sms){
                    const sendtouser = await Auth.findByIdAndUpdate(auth_id, {
@@ -113,8 +129,8 @@ const newApplication = async(req, res)=>{
                     var mailOptions = {
                         from: 'manwish01@gmail.com',
                         to: sendtouser?.email,
-                        subject: 'New Application at Water Department',
-                        text:  "New Application maked by you. Waiting verification..will take 2 days to verify"
+                        subject: 'New Application at Diamond Hub',
+                        text:  "New Application maked by you. Waiting verification..will take 2 days to verify documents"
                       };
                       
                       sendemail(mailOptions, function(error,info){
@@ -176,4 +192,4 @@ const getApplication = async(req, res)=>{
     }
 }
 
-module.exports ={getApplication, newApplication, viewcodes, updateApplication, applicationpayment, licensepayment};
+module.exports ={uploadPhoto, getApplication, newApplication, viewcodes, updateApplication, applicationpayment, licensepayment};

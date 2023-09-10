@@ -163,6 +163,7 @@ const addProjects = async(req, res)=>{
 }
 
 const getCompany = async(req, res)=>{
+    console.log(req.body);
     const {auth_id} = req.body;
 
     try{

@@ -15,10 +15,11 @@ dbConnect();
 const PORT = 3000;
 
 app.use(body_parser.json());
+app.use('/uploads', express.static(__dirname+'/uploads'));
 app.use(cors({
  
  credentials: true,
- origin: "https://waterhack.onrender.com"
+ origin: "http://localhost:5173"
 
 }));
 

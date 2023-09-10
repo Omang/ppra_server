@@ -5,7 +5,7 @@ const CompanySchema = new mongoose.Schema({
    auth_id: {type: mongoose.Schema.Types.ObjectId, ref: "Auth"},
    company_name:{type:String},
    company_cipa: {type: String},
-   company_directors: [{type: mongoose.Schema.Types.ObjectId, ref: "Directors"}],
+   company_directors: [{type: mongoose.Schema.Types.ObjectId, ref: "Director"}],
    company_assets: [{
       asset_name: {type: String},
       asset_value: {type: String},

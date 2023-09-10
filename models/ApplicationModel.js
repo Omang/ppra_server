@@ -5,7 +5,7 @@ const AppSchema = new mongoose.Schema({
         auth_id: {type: mongoose.Schema.Types.ObjectId, ref: "Auth"},
         application_type: {type: String},
         application_cost: {type: String},
-        application_village:{type:String},
+        application_attachment:[{type:String}],
         application_paid: {type:Boolean, default:false},
         license_paid: {type:Boolean, default:false},
         application_approved: {type: Boolean, default: true},

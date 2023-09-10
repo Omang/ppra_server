@@ -7,6 +7,34 @@ const Cat = require('../models/CategoryModel');
 const Subcodes = require('../models/SubcodesModel');
 const {sendemail} = require('../config/MailConnect');
 
+const appuser = async(req, res)=>{
+    const {appuser_id} = req.body;
+    try{
+
+        const getone = await Auth.findById(appuser_id);
+
+        res.json(getone);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+const getappusers = async(req, res)=>{
+    const {auth_id} = req.body;
+    
+    try{
+
+      const getthem = await Auth.find(
+        { role: { $ne: 'contractor' } }
+        )
+      res.json(getthem);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
 const createcat = async(req, res)=>{
     const {cat} = req.body;
 
@@ -420,4 +448,53 @@ const getsubcodes = async(req, res)=>{
         throw new Error(e);
     }
 }
-module.exports ={getallcodes, getsubcodes, appverifyreturn, createsubcodes, createCode, createcat, appevaluationreturn, appassessmentreturn, companycodesview, appverify, appassesment, appevaluation, appview, pendingview, assesmentview, evaluationview, adjudicationview };
+const addtheuser = async(req, res)=>{
+    console.log(req.body);
+    const {firstname, lastname, role, password, mobilenumber, email} = req.body;
+    try{
+
+       const onefind = await Auth.findOne({email: email});
+       if(onefind){
+        res.json({message: 'user exists'})
+       }else{
+         const adduser = await Auth.create({
+            firstname:firstname,
+            lastname: lastname,
+            password: password,
+            mobilenumber: mobilenumber,
+            role: role,
+            email:email
+        });
+        res.json(adduser);
+       }
+
+    }catch(e){
+        throw new Error(e);
+    }
+
+}
+
+const allcompanies = async(req, res)=>{
+    const {auth_id} = req.body;
+    try{
+
+        const themall = await Company.find();
+        res.json(themall);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+const onecompany = async(req, res)=>{
+    const {company_id} = req.body;
+    try{
+
+        const getit = await Company.findById(company_id).populate('company_directors');
+        res.json(getit);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+module.exports ={onecompany, allcompanies, addtheuser, appuser, getappusers, getallcodes, getsubcodes, appverifyreturn, createsubcodes, createCode, createcat, appevaluationreturn, appassessmentreturn, companycodesview, appverify, appassesment, appevaluation, appview, pendingview, assesmentview, evaluationview, adjudicationview };
