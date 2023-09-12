@@ -24,10 +24,10 @@ const uploadPhoto = async(req,res)=>{
 
 const applicationpayment = async(req, res)=>{
 
-    const {auth_id} = req.body;
+    const {auth_id, app_id} = req.body;
 
     try{
-           const payapp = await Application.findOneAndUpdate({auth_id:auth_id},{
+           const payapp = await Application.findByIdAndUpdate(app_id,{
             application_paid: true
            },{new:true});
 
@@ -37,14 +37,14 @@ const applicationpayment = async(req, res)=>{
             var mailOptions = {
                 from: 'manwish01@gmail.com',
                 to: finduserandupdate?.email,
-                subject: 'Payment Successful',
+                subject: 'Payment Successful at Diamond Hub',
                 text:  "Your payment has been successful, your application is on the next stage. will take 2 weeks"
               };
               
               sendemail(mailOptions, function(error,info){
                 if(error){
                   console.log(error);
-                  res.json(error);
+                  res.json({something: 'Payment Successful'});
                 }else{
                   res.json({message: 'Payment Successful'});
                 }
@@ -64,10 +64,10 @@ const applicationpayment = async(req, res)=>{
 
 const licensepayment = async(req, res)=>{
 
-    const {auth_id} = req.body;
+    const {auth_id, app_id} = req.body;
 
     try{
-           const payapp = await Application.findOneAndUpdate({auth_id:auth_id},{
+           const payapp = await Application.findByIdAndUpdate(app_id,{
             license_paid: true
            },{new:true});
 
@@ -77,18 +77,20 @@ const licensepayment = async(req, res)=>{
             var mailOptions = {
                 from: 'manwish01@gmail.com',
                 to: finduserandupdate?.email,
-                subject: 'Payment Successful',
-                text:  "Your payment has been successful, your application is on the next stage. will take 2 weeks"
+                subject: 'Payment Successful at Diamond Hub',
+                text:  "Your payment has been successful. Your certifcate or license was generated. Do business"
               };
               
               sendemail(mailOptions, function(error,info){
                 if(error){
                   console.log(error);
-                  res.json(error);
+                  res.json({something: 'something bad happend'});
                 }else{
                   res.json({message: 'Payment Successful'});
                 }
               })
+            }else{
+                res.json({something: 'something bad happend'})
             }
         
         
@@ -117,7 +119,7 @@ const newApplication = async(req, res)=>{
         if(addcode){
 
               const sms = await Comm.create({
-                    messsage_type: 'New Application at Water Department',
+                    messsage_type: 'New Application at Diamond Hub',
                     themessage: "New Application made by you. Waiting verification..will take 2 days to verify"
                 })
                 if(sms){
@@ -136,13 +138,18 @@ const newApplication = async(req, res)=>{
                       sendemail(mailOptions, function(error,info){
                         if(error){
                           console.log(error);
-                          res.json(error);
+                          res.json({something: 'something bad happend'});
                         }else{
                           res.json(addcode);
                         }
                       })
 
-                }
+                }else{
+                res.json({something: 'something bad happend'})
+            }
+
+            }else{
+                res.json({something: 'something bad happend'})
             }
 
     }catch(e){
@@ -152,12 +159,11 @@ const newApplication = async(req, res)=>{
 }
 
 const updateApplication = async(req, res)=>{
-    const {app_id, attachment, subcode_level} = req.body;
+    const {app_id, application_attachment} = req.body;
     try{
 
         const updateapp = Application.findByIdAndUpdate(app_id, {
-            attachment: attachment,
-            subcode_level: subcode_level
+            application_attachment: application_attachment,
         })
 
         res.json(updateapp);
@@ -191,5 +197,198 @@ const getApplication = async(req, res)=>{
         throw new Error(e);
     }
 }
+const appAll = async(req, res)=>{
+    const {application_type} = req.body;
+    try{
 
-module.exports ={uploadPhoto, getApplication, newApplication, viewcodes, updateApplication, applicationpayment, licensepayment};
+        const allapps = await Application.find({application_type: application_type});
+
+        res.json(allapps);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+const verifyreturn = async(req, res)=>{
+    const {app_id, auth_id, thehead, themessage} = req.body;
+
+    try{
+
+        const createsms = await Comm.create({
+            message_type: thehead,
+            themessage: themessage
+        });
+        if(createsms){
+            //send email and push to user
+            const updateuser = await Auth.findByIdAndUpdate(auth_id, {
+                $push:{
+                    messages: createsms._id.toString()
+                }
+            },{new:true});
+            const updateappsms = await Application.findByIdAndUpdate(app_id, {
+                $push:{
+                    application_comments: createsms._id.toString()
+                }
+            },{new:true})
+            var mailOptions = {
+                from: 'manwish01@gmail.com',
+                to: updateuser?.email,
+                subject: thehead,
+                text:  themessage
+              };
+              
+               sendemail(mailOptions, function(error,info){
+                if(error){
+                  console.log(error);
+                  res.json({something: 'something bad happend'});
+                }else{
+                  res.json({message: 'Ok'});
+                }
+              })
+        }else{
+        res.json({something: 'something bad happend'})
+    }
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+const appverify = async(req, res)=>{
+  
+  const  {app_id, auth_id} = req.body;
+  try{
+
+    const verifypass = await Application.findByIdAndUpdate(app_id,{
+        application_pending: false
+    });
+    //send sms to company for payment
+    if(verifypass){
+           
+            const createsms = await Comm.create({
+                message_type: "Application Payment",
+                themessage: "Your application have passed the verification stage. Please pay application fees"
+            });
+            if(createsms){
+                //send email and push to user
+                const updateuser = await Auth.findByIdAndUpdate(auth_id, {
+                    $push:{
+                        messages: createsms._id.toString()
+                    }
+                },{new:true});
+
+                var mailOptions = {
+                    from: 'manwish01@gmail.com',
+                    to: updateuser?.email,
+                    subject: "Application Payment",
+                    text:  "Your application have passed the verification stage at Diamond Hub. Please pay application fees"
+                  };
+                  
+                   sendemail(mailOptions, function(error,info){
+                    if(error){
+                      console.log(error);
+                      res.json({something: 'something bad happend'});
+                    }else{
+                      res.json({message: 'Ready'});
+                    }
+                  })
+            }else{
+        res.json({something: 'something bad happend'})
+    } 
+
+       
+
+
+    }else{
+        res.json({something: 'something bad happend'})
+    }
+    
+
+  }catch(e){
+    throw new Error(e);
+  }
+
+}
+
+const appapprove = async(req, res)=>{
+  
+  const  {app_id, auth_id, user_id} = req.body;
+  try{
+
+    const verifypass = await Application.findByIdAndUpdate(app_id,{
+        application_approved: true,
+        application_approveby: user_id
+    });
+    //send sms to company for payment
+    if(verifypass){
+           
+            const createsms = await Comm.create({
+                message_type: "Application Approved",
+                themessage: "Your application Approved. Please pay to get your certifcate or license"
+            });
+            if(createsms){
+                //send email and push to user
+                const updateuser = await Auth.findByIdAndUpdate(auth_id, {
+                    $push:{
+                        messages: createsms._id.toString()
+                    }
+                },{new:true});
+
+                var mailOptions = {
+                    from: 'manwish01@gmail.com',
+                    to: updateuser?.email,
+                    subject: "Application Approved",
+                    text:  "Your application Approved at Diamond Hub. Please pay to get your certifcate or license"
+                  };
+                  
+                   sendemail(mailOptions, function(error,info){
+                    if(error){
+                      console.log(error);
+                      res.json({something: 'something bad happend'});
+                    }else{
+                      res.json({message: 'Ready'});
+                    }
+                  })
+            }else{
+        res.json({something: 'something bad happend'})
+    } 
+
+       
+
+
+    }else{
+        res.json({something: 'something bad happend'})
+    }
+    
+
+  }catch(e){
+    throw new Error(e);
+  }
+
+}
+const officergetapp = async(req, res)=>{
+     const {app_id} = req.body;
+    try{
+
+      const getapp = await Application.findById(app_id);
+      if(getapp){
+
+        const companyget = await Company.findOne({auth_id: getapp.auth_id}).populate('company_directors');
+
+        res.json({
+            applicationdetails: getapp,
+            companydetails: companyget
+        })
+
+      }else{
+        res.json({something: 'something bad happend'})
+      }
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+
+module.exports ={verifyreturn, appverify, appapprove, officergetapp, appAll, uploadPhoto, getApplication, newApplication, viewcodes, updateApplication, applicationpayment, licensepayment};

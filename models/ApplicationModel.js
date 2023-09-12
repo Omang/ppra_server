@@ -8,7 +8,7 @@ const AppSchema = new mongoose.Schema({
         application_attachment:[{type:String}],
         application_paid: {type:Boolean, default:false},
         license_paid: {type:Boolean, default:false},
-        application_approved: {type: Boolean, default: true},
+        application_approved: {type: Boolean, default: false},
         application_pending: {type: Boolean, default: true},
         application_approveby: {type: mongoose.Schema.Types.ObjectId, ref:'Auth'},
         application_comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comm'}]
