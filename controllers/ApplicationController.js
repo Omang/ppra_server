@@ -7,6 +7,7 @@ const Auth = require('../models/AuthModel');
 const Subcodes = require('../models/SubcodesModel');
 const multer = require('multer');
 const fs = require('fs');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 const uploadPhoto = async(req,res)=>{
     const uploadedFiles = [];
