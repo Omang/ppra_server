@@ -7,7 +7,7 @@ const Auth = require('../models/AuthModel');
 const Subcodes = require('../models/SubcodesModel');
 const multer = require('multer');
 const fs = require('fs');
-const stripe = require('stripe')(process.env.STRIPE_KEY);
+const stripe = require('stripe')("sk_test_tUmUpgvfbpuVPlZae9f23GSa00RYQd7TBP");
 
 const uploadPhoto = async(req,res)=>{
     const uploadedFiles = [];
@@ -23,37 +23,51 @@ const uploadPhoto = async(req,res)=>{
     res.json(uploadedFiles);  
 }
 
+const getkey = async(req, res)=>{
+    const {id} = req.body;
+    try{
+
+        res.json({publish_key: process.env.PUBLISH_KEY})
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
 const applicationpayment = async(req, res)=>{
 
-    const {auth_id, app_id} = req.body;
+    const {id} = req.body;
+
+    console.log(req.body);
 
     try{
-           const payapp = await Application.findByIdAndUpdate(app_id,{
-            application_paid: true
-           },{new:true});
-
-
-            if(payapp){
-            const finduserandupdate = await Auth.findById(auth_id);
-            var mailOptions = {
-                from: 'manwish01@gmail.com',
-                to: finduserandupdate?.email,
-                subject: 'Payment Successful at Diamond Hub',
-                text:  "Your payment has been successful, your application is on the next stage. will take 2 weeks"
-              };
-              
-              sendemail(mailOptions, function(error,info){
-                if(error){
-                  console.log(error);
-                  res.json({something: 'Payment Successful'});
-                }else{
-                  res.json({message: 'Payment Successful'});
-                }
-              })
-            }
         
-        
+      const getapp = await Application.findById(id);
 
+      if(getapp){
+
+        const getuser = await Auth.findById(getapp.auth_id);
+        if(getuser){
+    const paymenIntent = await stripe.paymentIntents.create({
+        currency: "usd",
+        amount: 100,
+        automatic_payment_methods:{
+            enabled: true
+        },
+        metadata: {
+            email: getuser.email,
+            item: getapp.application_type
+         },
+      })
+
+      res.json({clientSecret:paymenIntent.client_secret})
+        }else{
+            res.json({error:"cant get the user"});
+        }
+
+      }else{
+        res.json({error: "something bad happend"});
+      }
        
     }catch(e){
 
@@ -61,6 +75,43 @@ const applicationpayment = async(req, res)=>{
 
     }
 
+}
+
+const paysuccess = async(req, res)=>{
+    const {id} = req.body;
+    try{
+
+        const payapp = await Application.findByIdAndUpdate(id,{
+            application_paid: true
+           },{new:true});
+
+
+            if(payapp){
+            const finduserandupdate = await Auth.findById(payapp.auth_id);
+            var mailOptions = {
+                from: 'manwish01@gmail.com',
+                to: finduserandupdate?.email,
+                subject: 'Payment Successful at Diamond Hub',
+                text:  "Your application payment has been successful. It will take 2 weeks to get a Certificate or License or Permit"
+              };
+              
+              sendemail(mailOptions, function(error,info){
+                if(error){
+                  console.log(error);
+                  res.json({something: 'Email sent Unsuccessful'});
+                }else{
+                  res.json({message: 'Email sent Successful'});
+                }
+              })
+            }else{
+
+                res.json({something: 'Email sent Unsuccessful'})
+
+            }
+
+    }catch(e){
+        throw new Error(e);
+    }
 }
 
 const licensepayment = async(req, res)=>{
@@ -391,5 +442,18 @@ const officergetapp = async(req, res)=>{
     }
 }
 
+const applicationGet = async(req, res)=>{
+    const {id} = req.params;
+    try{
 
-module.exports ={verifyreturn, appverify, appapprove, officergetapp, appAll, uploadPhoto, getApplication, newApplication, viewcodes, updateApplication, applicationpayment, licensepayment};
+        const getone = await Application.findById(id);
+
+        res.json(getone);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+
+module.exports ={paysuccess, getkey, applicationGet, verifyreturn, appverify, appapprove, officergetapp, appAll, uploadPhoto, getApplication, newApplication, viewcodes, updateApplication, applicationpayment, licensepayment};
