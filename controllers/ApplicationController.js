@@ -340,20 +340,20 @@ const appverify = async(req, res)=>{
                    sendemail(mailOptions, function(error,info){
                     if(error){
                       console.log(error);
-                      res.json({something: 'something bad happend'});
+                      res.json({something: 'Email not sent'});
                     }else{
                       res.json({message: 'Ready'});
                     }
                   })
             }else{
-        res.json({something: 'something bad happend'})
+        res.json({something: 'Message not created'})
     } 
 
        
 
 
     }else{
-        res.json({something: 'something bad happend'})
+        res.json({something: 'Application not updated'})
     }
     
 
@@ -371,13 +371,18 @@ const appapprove = async(req, res)=>{
     const verifypass = await Application.findByIdAndUpdate(app_id,{
         application_approved: true,
         application_approveby: user_id
-    });
+    }, {new: true});
+    const apptocompany = await Company.findOneAndUpdate({auth_id: auth_id}, {
+        $push: {
+            company_certificates: app_id
+        }
+    }, {new: true});
     //send sms to company for payment
-    if(verifypass){
+    if(verifypass && apptocompany){
            
             const createsms = await Comm.create({
-                message_type: "Application Approved",
-                themessage: "Your application Approved. Please pay to get your certifcate or license"
+                message_type: "Application Approved at Diamond Hub",
+                themessage: "Your application Approved. Please login into the system to get your certifcate or license"
             });
             if(createsms){
                 //send email and push to user
@@ -390,8 +395,8 @@ const appapprove = async(req, res)=>{
                 var mailOptions = {
                     from: 'manwish01@gmail.com',
                     to: updateuser?.email,
-                    subject: "Application Approved",
-                    text:  "Your application Approved at Diamond Hub. Please pay to get your certifcate or license"
+                    subject: "Application Approved at Diamond Hub",
+                    text:  "Your application Approved at Diamond Hub. Please login into the system to get your certifcate or license"
                   };
                   
                    sendemail(mailOptions, function(error,info){

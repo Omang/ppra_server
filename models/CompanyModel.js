@@ -41,6 +41,7 @@ const CompanySchema = new mongoose.Schema({
    company_projects:[{type: mongoose.Schema.Types.ObjectId, ref: "Projects"}],
    codes_payments: {type: mongoose.Schema.Types.ObjectId, ref: "Payment"},
    codes_express: {type: mongoose.Schema.Types.ObjectId, ref: "Payment"},
+   company_certificates: [{type: mongoose.Schema.Types.ObjectId, ref: "Application"}],
    payment_waiting: {type: Boolean, default: false}
 }, {timestamps: true});
 
