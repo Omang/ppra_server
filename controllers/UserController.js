@@ -226,4 +226,24 @@ const logout =async(req, res)=>{
 
 }
 
-module.exports = {uploadfile, registeruser, loginuser, logout, addStuff, getUser, sendmail, updateContractor};
+const getallmessage = async(req, res)=>{
+  const {auth_id} = req.body;
+  try{
+
+    const allmessages = await Auth.findById(auth_id).populate('messages');
+
+    if(allmessages){
+
+      res.json({message: allmessages.messages});
+
+    }else{
+      res.json({something:'something bad happend'});
+    }
+
+
+  }catch(e){
+    throw new Error(e);
+  }
+}
+
+module.exports = {getallmessage, uploadfile, registeruser, loginuser, logout, addStuff, getUser, sendmail, updateContractor};

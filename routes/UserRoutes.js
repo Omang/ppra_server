@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 
-const {uploadfile, registeruser, loginuser, logout, addStuff, getUser, sendmail, updateContractor} = require('../controllers/UserController');
+const {getallmessage, uploadfile, registeruser, loginuser, logout, addStuff, getUser, sendmail, updateContractor} = require('../controllers/UserController');
 const { authMiddleware, isAdmin, isVerifier, isAssessor, isEvaluator } = require('../middlewares/authMiddleware');
 
 router.post('/register', registeruser);
@@ -13,6 +13,7 @@ router.post('/logout', authMiddleware, logout);
 router.get('/getuser/:id', authMiddleware, getUser);
 router.post('/mailsend', sendmail);
 router.post('/uploadfile', uploadfile);
+router.post('/allsms', getallmessage);
 
 
 module.exports = router;

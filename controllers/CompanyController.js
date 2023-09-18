@@ -2,6 +2,94 @@ const Company = require('../models/CompanyModel');
 const Project = require('../models/ProjectModel');
 const Director = require('../models/DirectorsModel');
 const Comm = require('../models/ComModel');
+const axios = require('axios');
+
+
+const onecompany = async(req, res)=>{
+    const {company_id} = req.body;
+
+    try{
+
+        const companyone = await Company.findById(company_id);
+
+        res.json(companyone);
+
+    }catch(e){
+        throw new Error(e)
+    }
+}
+
+const allcompanies = async(req, res)=>{
+
+    const {user_id} = req.body;
+
+    try{
+
+        const allofthem = await Company.find();
+        res.json(allofthem);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+
+const addbankstatements = async(req, res)=>{
+    const {company_id, company_bankstatements} = req.body;
+    const added = [];
+    try{
+
+        for (var i = 0; i < company_bankstatements.length; i++) {
+
+           const addone = await Company.findByIdAndUpdate(company_id, {
+            $push: {
+                company_bankstatements: company_bankstatements[i]
+            }
+        },{new: true}) 
+           added.push(addone);
+        }
+
+        res.json(added);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+const addtransactions = async(req, res)=>{
+    const {company_id, company_transactions} = req.body;
+    const addone = [];
+    try{
+
+        for (var i = 0; i < company_transactions.length; i++) {
+            
+           const addonex = await Company.findByIdAndUpdate(company_id, {
+            $push: {
+                company_transactions: company_transactions[i]
+            }
+        },{new: true}) 
+           addone.push(addonex);
+        }
+        res.json(addone);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
+
+const companyemployees = async(req, res)=>{
+    const {company_name} = req.body;
+    try{
+
+        const {data} = await axios.post('http://localhost:3004/findbycompany', {
+        company_name: company_name
+    });
+        res.json(data);
+
+    }catch(e){
+        throw new Error(e);
+    }
+}
 
 const updateCompany = async(req, res)=>{
     const {company_id,
@@ -224,4 +312,4 @@ const updatedirector = async(req, res)=>{
     }
 }
 
-module.exports = {updatedirector, addnewdirector, getCompany, addProjects, newCompany, updateCompany};
+module.exports = {allcompanies, onecompany, addbankstatements, addtransactions, companyemployees, updatedirector, addnewdirector, getCompany, addProjects, newCompany, updateCompany};
