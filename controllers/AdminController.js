@@ -496,5 +496,20 @@ const onecompany = async(req, res)=>{
         throw new Error(e);
     }
 }
+const getapproveapp = async(req, res)=>{
+    const {auth_id} = req.body;
+    try{
 
-module.exports ={onecompany, allcompanies, addtheuser, appuser, getappusers, getallcodes, getsubcodes, appverifyreturn, createsubcodes, createCode, createcat, appevaluationreturn, appassessmentreturn, companycodesview, appverify, appassesment, appevaluation, appview, pendingview, assesmentview, evaluationview, adjudicationview };
+        const findit = await Application.findOne({auth_id: auth_id}).populate('application_approveby');
+        if(findit.application_approved){
+            res.json(findit);
+        }else{
+            res.json({message: 'no approved applications'});
+        }
+
+    }catch(e){
+        throw new Error(e)
+    }
+}
+
+module.exports ={getapproveapp, onecompany, allcompanies, addtheuser, appuser, getappusers, getallcodes, getsubcodes, appverifyreturn, createsubcodes, createCode, createcat, appevaluationreturn, appassessmentreturn, companycodesview, appverify, appassesment, appevaluation, appview, pendingview, assesmentview, evaluationview, adjudicationview };

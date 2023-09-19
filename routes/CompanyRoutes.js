@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {allcompanies, onecompany, addbankstatements, addtransactions, companyemployees, updatedirector, addnewdirector, getCompany, addProjects, newCompany, updateCompany} = require('../controllers/CompanyController');
+const {checkcipa, allcompanies, onecompany, addbankstatements, addtransactions, companyemployees, updatedirector, addnewdirector, getCompany, addProjects, newCompany, updateCompany} = require('../controllers/CompanyController');
 const { authMiddleware, isAdmin, isVerifier, isAssessor, isEvaluator } = require('../middlewares/authMiddleware');
 
 router.post('/addcompany', authMiddleware, newCompany);
@@ -13,7 +13,8 @@ router.post('/getcompanyemployees', companyemployees);
 router.post('/addbankstatements', addbankstatements);
 router.post('/addtransactions', addtransactions);
 router.post('/onecompany', onecompany);
-router.post('/allcompanies', allcompanies)
+router.post('/allcompanies', allcompanies);
+router.post('/checkcipa', checkcipa);
 
 
 module.exports = router;

@@ -312,4 +312,24 @@ const updatedirector = async(req, res)=>{
     }
 }
 
-module.exports = {allcompanies, onecompany, addbankstatements, addtransactions, companyemployees, updatedirector, addnewdirector, getCompany, addProjects, newCompany, updateCompany};
+const checkcipa = async(req, res)=>{
+    const {company_cipa} = req.body;
+    console.log(company_cipa)
+    try{
+
+        const {data} = await axios.post('http://localhost:4000/cipa/findone', {
+            company_cipa: company_cipa
+        });
+        console.log(data);
+        if(data){
+            res.json({message: data})
+        }else{
+            res.json({something: "nothing bro"});
+        }
+
+    }catch(e){
+        throw new Error(e);
+    }
+} 
+
+module.exports = {checkcipa, allcompanies, onecompany, addbankstatements, addtransactions, companyemployees, updatedirector, addnewdirector, getCompany, addProjects, newCompany, updateCompany};
